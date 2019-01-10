@@ -171,6 +171,33 @@ describe('Components', () => {
 		expect(scratch.innerHTML).to.equal('<span>span in a component</span>');
 	});
 
+	it('should be unmounted when replaced with an element of the same nodeName', () => {
+		class Comp extends Component {
+			componentDidMount() {}
+			componentWillUnmount() {}
+			render() {
+				return <div>My component</div>;
+			}
+		}
+
+		let root;
+		function test(content) {
+			root = render(content, scratch, root);
+		}
+
+		sinon.spy(Comp.prototype, 'componentDidMount');
+		sinon.spy(Comp.prototype, 'componentWillUnmount');
+
+		test(<Comp />);
+		test(<div>just a div</div>);
+
+
+		expect(scratch.innerHTML).to.equal('<div>just a div</div>');
+
+		expect(Comp.prototype.componentDidMount).to.have.been.calledOnce;
+		expect(Comp.prototype.componentWillUnmount).to.have.been.calledOnce;
+	});
+
 
 	// Test for Issue #176
 	it('should remove children when root changes to text node', () => {
